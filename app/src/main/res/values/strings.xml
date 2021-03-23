@@ -7,4 +7,6 @@
     <string name="Logs">Logs</string>
     <string name="Blacklist">Blacklist</string>
     <string name="Whitelist">Whitelist</string>
+    <string name="Enabled">Enabled</string>
+    <string name="Disabled">Disabled</string>
 </resources>

@@ -39,11 +39,8 @@ class StartAppOnBoot : BroadcastReceiver() {
             //Get rules from JSON
             val ruleSet: RuleSet = gson.fromJson(json, type)
 
-            //Set the current mode
-            mode = ruleSet.mode
-
             //Get all packages with default rules based on mode
-            list = getPackages(mode, context)
+            list = getPackages(ruleSet.mode, context)
 
             //Iterate through apps and adjust rules
             //This way we using the current package list as base
@@ -57,7 +54,7 @@ class StartAppOnBoot : BroadcastReceiver() {
                 }
             }
 
-            IPTablesHelper.applyRuleset(RuleSet(mode, list))
+            IPTablesHelper.applyRuleset(RuleSet(ruleSet.enabled, ruleSet.mode, list))
         }
     }
 

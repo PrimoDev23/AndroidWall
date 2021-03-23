@@ -27,7 +27,6 @@ class RulesFragmentViewModel : ViewModel(){
 
     fun QueryAllPackages() {
         val list : List<Rule>
-        var mode = FirewallMode.WHITELIST
 
         if (ruleFile.exists()) {
             //Read JSON
@@ -40,11 +39,8 @@ class RulesFragmentViewModel : ViewModel(){
             //Get rules from JSON
             val ruleSet : RuleSet = gson.fromJson(json, type)
 
-            //Set the current mode
-            mode = ruleSet.mode
-
             //Get all packages with default rules based on mode
-            list = getPackages(mode)
+            list = getPackages(ruleSet.mode)
 
             //Iterate through apps and adjust rules
             //This way we using the current package list as base
@@ -57,16 +53,16 @@ class RulesFragmentViewModel : ViewModel(){
                     pack.vpnEnabled = r.vpnEnabled
                 }
             }
+
+            //Set the packages
+            _Packages.value = RuleSet(ruleSet.enabled, ruleSet.mode, list)
         } else {
             //Get all packages with default rules based on mode
-            list = getPackages(mode)
+            list = getPackages(FirewallMode.WHITELIST)
 
             //If it's the first run just use a clean ruleset
-            saveSettings(RuleSet(mode, list))
+            saveSettings(RuleSet(false, FirewallMode.WHITELIST, list))
         }
-
-        //Set the packages
-        _Packages.value = RuleSet(mode, list)
     }
 
     private fun getPackages(mode : FirewallMode) : List<Rule>{
@@ -120,5 +116,13 @@ class RulesFragmentViewModel : ViewModel(){
         }
 
         _Packages.value = rules
+    }
+
+    fun toggleEnabled(){
+        val ruleSet = _Packages.value!!
+
+        ruleSet.enabled = !ruleSet.enabled
+
+        _Packages.value = ruleSet
     }
 }

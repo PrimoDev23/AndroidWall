@@ -17,8 +17,8 @@ import com.example.androidwall.viewmodels.RulesFragmentViewModel
 
 class RulesFragment : Fragment() {
 
-    private lateinit var binding : FragmentRulesBinding
-    private lateinit var viewModel : RulesFragmentViewModel
+    private lateinit var binding: FragmentRulesBinding
+    private lateinit var viewModel: RulesFragmentViewModel
     private lateinit var listAdapter: AppListAdapter
 
     override fun onCreateView(
@@ -58,7 +58,7 @@ class RulesFragment : Fragment() {
         return binding.root
     }
 
-    private fun initObservers(){
+    private fun initObservers() {
         viewModel.Packages.observe(viewLifecycleOwner, Observer {
             listAdapter.ruleSets = it
             listAdapter.notifyDataSetChanged()
@@ -67,18 +67,20 @@ class RulesFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.toolbarmenu, menu)
-        changeIcon(menu.getItem(0))
+        changeIcon(menu.getItem(0).subMenu.getItem(0))
+        changeIcon(menu.getItem(0).subMenu.getItem(1))
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.toggle_mode -> toggleMode(item)
+            R.id.toggle_enabled -> toggleEnabled(item)
         }
         return true
     }
 
-    private fun toggleMode(item : MenuItem){
+    private fun toggleMode(item: MenuItem) {
         viewModel.toggleMode()
         listAdapter.ruleSets = viewModel.Packages.value!!
         listAdapter.notifyDataSetChanged()
@@ -86,10 +88,35 @@ class RulesFragment : Fragment() {
         changeIcon(item)
     }
 
-    private fun changeIcon(item : MenuItem){
-        when(viewModel.Packages.value!!.mode){
-            FirewallMode.WHITELIST -> item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_whitelist)
-            FirewallMode.BLACKLIST -> item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_blacklist)
+    private fun toggleEnabled(item: MenuItem) {
+        viewModel.toggleEnabled()
+        listAdapter.ruleSets = viewModel.Packages.value!!
+        listAdapter.notifyDataSetChanged()
+
+        changeIcon(item)
+    }
+
+    private fun changeIcon(item: MenuItem) {
+        if(item.itemId == R.id.toggle_mode){
+            when (viewModel.Packages.value!!.mode) {
+                FirewallMode.WHITELIST -> {
+                    item.title = getString(R.string.Whitelist)
+                }
+                FirewallMode.BLACKLIST -> {
+                    item.title = getString(R.string.Blacklist)
+                }
+            }
+        }else{
+            when (viewModel.Packages.value!!.enabled) {
+                true -> {
+                    item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_enabled)
+                    item.title = getString(R.string.Enabled)
+                }
+                false -> {
+                    item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_disabled)
+                    item.title = getString(R.string.Disabled)
+                }
+            }
         }
     }
 }
