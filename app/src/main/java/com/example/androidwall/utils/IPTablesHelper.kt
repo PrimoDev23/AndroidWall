@@ -35,7 +35,7 @@ object IPTablesHelper {
 
         for (rule in ruleset.rules) {
             //Block all wifi connections
-            if ((ruleset.mode == FirewallMode.WHITELIST && rule.wifiEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.wifiEnabled)) {
+            if (rule.wifiEnabled) {
                 runCommand(
                     shell.outputStream,
                     "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j $policy"
@@ -43,7 +43,7 @@ object IPTablesHelper {
             }
 
             //Block all cellular connections
-            if ((ruleset.mode == FirewallMode.WHITELIST && rule.cellularEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.cellularEnabled)) {
+            if (rule.cellularEnabled) {
                 runCommand(
                     shell.outputStream,
                     "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j  $policy"
@@ -51,7 +51,7 @@ object IPTablesHelper {
             }
 
             //Block all vpn connections
-            if ((ruleset.mode == FirewallMode.WHITELIST && rule.vpnEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.vpnEnabled)) {
+            if (rule.vpnEnabled) {
                 runCommand(
                     shell.outputStream,
                     "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j  $policy"
