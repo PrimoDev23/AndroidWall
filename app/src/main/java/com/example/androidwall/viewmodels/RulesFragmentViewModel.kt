@@ -82,7 +82,7 @@ class RulesFragmentViewModel : ViewModel(){
         //Get all packages with corresponding uids
         for (pack in packages) {
             val info = pack.applicationInfo
-            if (info.name != null && info.enabled) {
+            if (info.packageName != null && info.enabled) {
                 list.add(Rule(info.packageName, info.uid, default, default, default))
             }
         }
