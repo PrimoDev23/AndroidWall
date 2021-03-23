@@ -44,6 +44,8 @@ class LogsFragment : Fragment() {
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
         }
 
+        binding.logList.scrollToPosition(viewModel.Logs.value!!.size - 1)
+
         return binding.root
     }
 
