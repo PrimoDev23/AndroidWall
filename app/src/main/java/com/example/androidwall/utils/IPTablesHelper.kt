@@ -28,6 +28,8 @@ object IPTablesHelper {
                 "iptables -P OUTPUT ACCEPT")
         }
 
+        val policy = if (ruleset.mode == FirewallMode.WHITELIST) "ACCEPT" else "DROP"
+
         //Accept all outgoing connections to loopback
         runCommand(shell.outputStream, "iptables -A OUTPUT -o lo -j ACCEPT")
 
@@ -36,7 +38,7 @@ object IPTablesHelper {
             if ((ruleset.mode == FirewallMode.WHITELIST && rule.wifiEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.wifiEnabled)) {
                 runCommand(
                     shell.outputStream,
-                    "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
+                    "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j $policy"
                 )
             }
 
@@ -44,7 +46,7 @@ object IPTablesHelper {
             if ((ruleset.mode == FirewallMode.WHITELIST && rule.cellularEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.cellularEnabled)) {
                 runCommand(
                     shell.outputStream,
-                    "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
+                    "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j  $policy"
                 )
             }
 
@@ -52,7 +54,7 @@ object IPTablesHelper {
             if ((ruleset.mode == FirewallMode.WHITELIST && rule.vpnEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.vpnEnabled)) {
                 runCommand(
                     shell.outputStream,
-                    "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
+                    "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j  $policy"
                 )
             }
         }
