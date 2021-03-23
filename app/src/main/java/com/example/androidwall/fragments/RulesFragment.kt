@@ -1,16 +1,16 @@
 package com.example.androidwall.fragments
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.androidwall.R
 import com.example.androidwall.adapter.AppListAdapter
 import com.example.androidwall.databinding.FragmentRulesBinding
+import com.example.androidwall.models.FirewallMode
 import com.example.androidwall.viewmodels.RulesFragmentViewModel
 
 class RulesFragment : Fragment() {
@@ -50,6 +50,8 @@ class RulesFragment : Fragment() {
 
         initObservers()
 
+        setHasOptionsMenu(true)
+
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -59,5 +61,28 @@ class RulesFragment : Fragment() {
             listAdapter.ruleSets = it
             listAdapter.notifyDataSetChanged()
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.toolbarmenu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.toggle_mode -> toggleMode(item)
+        }
+        return true
+    }
+
+    private fun toggleMode(item : MenuItem){
+        viewModel.toggleMode()
+        listAdapter.ruleSets = viewModel.Packages.value!!
+        listAdapter.notifyDataSetChanged()
+
+        when(viewModel.Packages.value!!.mode){
+            FirewallMode.WHITELIST -> item.title = getString(R.string.Whitelist)
+            FirewallMode.BLACKLIST -> item.title = getString(R.string.Blacklist)
+        }
     }
 }

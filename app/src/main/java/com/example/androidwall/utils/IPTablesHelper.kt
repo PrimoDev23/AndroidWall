@@ -1,20 +1,15 @@
 package com.example.androidwall.utils
 
-import com.example.androidwall.models.Log
+import com.example.androidwall.models.FirewallMode
+import com.example.androidwall.models.Rule
 import com.example.androidwall.models.RuleSet
-import java.io.DataOutputStream
 import java.io.OutputStream
-import java.net.Inet6Address
-import java.net.NetworkInterface
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import kotlin.reflect.typeOf
 
 object IPTablesHelper {
 
     //Currently we only have whitelist mode and selected all by default
     //This is for testing purposes but will change later
-    fun applyRuleset(ruleset: List<RuleSet>) {
+    fun applyRuleset(ruleset : RuleSet) {
         //Get a root shell
         val shell = Runtime.getRuntime().exec("su")
 
@@ -23,11 +18,11 @@ object IPTablesHelper {
 
         Logger.writeLog("iptables -F OUTPUT");
 
-        for (rule in ruleset) {
+        for (rule in ruleset.rules) {
             var command : String
 
             //Block all wifi connections
-            if (!rule.wifiEnabled) {
+            if ((ruleset.mode == FirewallMode.WHITELIST && !rule.wifiEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && rule.wifiEnabled)) {
                 command = "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j REJECT"
                 runCommand(
                     shell.outputStream,
@@ -37,7 +32,7 @@ object IPTablesHelper {
             }
 
             //Block all cellular connections
-            if (!rule.cellularEnabled) {
+            if ((ruleset.mode == FirewallMode.WHITELIST && !rule.cellularEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && rule.cellularEnabled)) {
                 command = "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j REJECT"
                 runCommand(
                     shell.outputStream,
@@ -47,7 +42,7 @@ object IPTablesHelper {
             }
 
             //Block all vpn connections
-            if (!rule.vpnEnabled) {
+            if ((ruleset.mode == FirewallMode.WHITELIST && !rule.vpnEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && rule.vpnEnabled)) {
                 command = "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j REJECT"
                 runCommand(
                     shell.outputStream,

@@ -9,9 +9,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidwall.R
+import com.example.androidwall.models.Rule
 import com.example.androidwall.models.RuleSet
 
-class AppListAdapter(var ruleSets : List<RuleSet>, val context : Context) : RecyclerView.Adapter<AppListAdapter.AppListViewHolder>() {
+class AppListAdapter(var ruleSets : RuleSet, val context : Context) : RecyclerView.Adapter<AppListAdapter.AppListViewHolder>() {
 
     inner class AppListViewHolder(view : View) : RecyclerView.ViewHolder(view) {
         val txt_name : TextView = view.findViewById(R.id.txt_name)
@@ -29,11 +30,11 @@ class AppListAdapter(var ruleSets : List<RuleSet>, val context : Context) : Recy
     }
 
     override fun getItemCount(): Int {
-        return ruleSets.size
+        return ruleSets.rules.size
     }
 
     override fun onBindViewHolder(holder: AppListViewHolder, position: Int) {
-        val pack : RuleSet = ruleSets[position]
+        val pack : Rule = ruleSets.rules[position]
 
         //Init the views
         holder.txt_name.text = pack.name
@@ -45,15 +46,15 @@ class AppListAdapter(var ruleSets : List<RuleSet>, val context : Context) : Recy
 
         //Update ruleset according to user actions
         holder.chk_wifi.setOnClickListener {
-            ruleSets[position].wifiEnabled = holder.chk_wifi.isChecked
+            pack.wifiEnabled = holder.chk_wifi.isChecked
         }
 
         holder.chk_cellular.setOnClickListener {
-            ruleSets[position].cellularEnabled = holder.chk_cellular.isChecked
+            pack.cellularEnabled = holder.chk_cellular.isChecked
         }
 
         holder.chk_vpn.setOnClickListener {
-            ruleSets[position].vpnEnabled = holder.chk_vpn.isChecked
+            pack.vpnEnabled = holder.chk_vpn.isChecked
         }
     }
 

@@ -5,4 +5,6 @@
     <string name="VPN">VPN</string>
     <string name="Home">Home</string>
     <string name="Logs">Logs</string>
+    <string name="Blacklist">Blacklist</string>
+    <string name="Whitelist">Whitelist</string>
 </resources>

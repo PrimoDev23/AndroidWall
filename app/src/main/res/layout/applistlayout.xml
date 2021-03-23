@@ -38,10 +38,12 @@
         android:id="@+id/chk_wifi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="@string/WiFi"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/chk_cellular"
         app:layout_constraintStart_toEndOf="@id/img_app"
-        app:layout_constraintEnd_toStartOf="@id/chk_cellular"
         app:layout_constraintTop_toBottomOf="@id/txt_uid" />
 
     <CheckBox
@@ -50,18 +52,19 @@
         android:layout_height="wrap_content"
         android:text="@string/Cellular"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/chk_wifi"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_uid" />
+        app:layout_constraintEnd_toStartOf="@+id/chk_vpn"
+        app:layout_constraintTop_toBottomOf="@id/txt_uid"
+        app:layout_constraintVertical_bias="1.0" />
 
     <CheckBox
         android:id="@+id/chk_vpn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="@string/VPN"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/chk_cellular"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txt_uid" />
+        app:layout_constraintStart_toEndOf="@+id/chk_cellular"
+        app:layout_constraintTop_toBottomOf="@id/txt_uid"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

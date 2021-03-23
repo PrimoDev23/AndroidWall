@@ -2,7 +2,6 @@ package com.example.androidwall.utils
 
 import android.content.Context
 import com.example.androidwall.models.Log
-import com.example.androidwall.models.RuleSet
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
