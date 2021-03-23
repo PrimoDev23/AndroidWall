@@ -3,6 +3,7 @@ package com.example.androidwall.fragments
 import android.os.Bundle
 import android.view.*
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -66,6 +67,7 @@ class RulesFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.toolbarmenu, menu)
+        changeIcon(menu.getItem(0))
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -81,6 +83,10 @@ class RulesFragment : Fragment() {
         listAdapter.ruleSets = viewModel.Packages.value!!
         listAdapter.notifyDataSetChanged()
 
+        changeIcon(item)
+    }
+
+    private fun changeIcon(item : MenuItem){
         when(viewModel.Packages.value!!.mode){
             FirewallMode.WHITELIST -> item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_whitelist)
             FirewallMode.BLACKLIST -> item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_blacklist)
