@@ -15,40 +15,49 @@ object IPTablesHelper {
 
         //Flush the current iptables
         runCommand(shell.outputStream, "iptables -F OUTPUT")
+        runCommand(shell.outputStream, "iptables -F INPUT")
 
-        Logger.writeLog("iptables -F OUTPUT");
+        //Default to drop
+        runCommand(shell.outputStream, "iptables -P OUTPUT DROP")
+        runCommand(shell.outputStream, "iptables -P INPUT DROP")
 
         for (rule in ruleset.rules) {
             var command : String
 
             //Block all wifi connections
-            if ((ruleset.mode == FirewallMode.WHITELIST && !rule.wifiEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && rule.wifiEnabled)) {
-                command = "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j REJECT"
+            if ((ruleset.mode == FirewallMode.WHITELIST && rule.wifiEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.wifiEnabled)) {
                 runCommand(
                     shell.outputStream,
-                    command
+                    "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
                 )
-                Logger.writeLog(command)
+                runCommand(
+                    shell.outputStream,
+                    "iptables -A INPUT -i wlan+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
+                )
             }
 
             //Block all cellular connections
-            if ((ruleset.mode == FirewallMode.WHITELIST && !rule.cellularEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && rule.cellularEnabled)) {
-                command = "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j REJECT"
+            if ((ruleset.mode == FirewallMode.WHITELIST && rule.cellularEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.cellularEnabled)) {
                 runCommand(
                     shell.outputStream,
-                    command
+                    "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
                 )
-                Logger.writeLog(command)
+                runCommand(
+                    shell.outputStream,
+                    "iptables -A INPUT -i rmnet+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
+                )
             }
 
             //Block all vpn connections
-            if ((ruleset.mode == FirewallMode.WHITELIST && !rule.vpnEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && rule.vpnEnabled)) {
-                command = "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j REJECT"
+            if ((ruleset.mode == FirewallMode.WHITELIST && rule.vpnEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.vpnEnabled)) {
                 runCommand(
                     shell.outputStream,
-                    command
+                    "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
                 )
-                Logger.writeLog(command)
+                runCommand(
+                    shell.outputStream,
+                    "iptables -A INPUT -i tun+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
+                )
             }
         }
 
@@ -56,6 +65,7 @@ object IPTablesHelper {
     }
 
     private fun runCommand(os: OutputStream, command: String) {
+        Logger.writeLog(command)
         os.write((command + "\n").toByteArray())
         os.flush()
     }
