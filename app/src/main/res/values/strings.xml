@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AndroidWall</string>
+    <string name="WiFi">WiFi</string>
+    <string name="Cellular">Cellular</string>
+    <string name="VPN">VPN</string>
+    <string name="Home">Home</string>
+    <string name="Logs">Logs</string>
+</resources>
