@@ -5,6 +5,10 @@
     <string name="VPN">VPN</string>
     <string name="Home">Home</string>
     <string name="Logs">Logs</string>
+
+    <string name="Options">Options</string>
+    <string name="FirewallMode">Firewall Mode</string>
+
     <string name="Blacklist">Blacklist</string>
     <string name="Whitelist">Whitelist</string>
     <string name="Enabled">Enabled</string>

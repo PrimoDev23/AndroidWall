@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity() {
 
         val config = AppBarConfiguration(setOf(
             R.id.fragment_home,
-            R.id.fragment_logs
+            R.id.fragment_logs,
+            R.id.fragment_options
         ))
 
         setupActionBarWithNavController(navController, config)

@@ -12,11 +12,6 @@
                 android:icon="@drawable/ic_disabled"
                 android:title="@string/Disabled"
                 app:showAsAction="ifRoom" />
-            <item
-                android:id="@+id/toggle_mode"
-                android:icon="@drawable/ic_mode"
-                android:title="@string/Whitelist"
-                app:showAsAction="ifRoom" />
         </menu>
     </item>
 </menu>

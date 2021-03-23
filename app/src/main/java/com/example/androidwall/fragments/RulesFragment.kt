@@ -28,11 +28,13 @@ class RulesFragment : Fragment() {
 
         binding = FragmentRulesBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProvider(this).get(RulesFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity()).get(RulesFragmentViewModel::class.java)
         viewModel.context = requireContext()
 
-        //Query all installed packages
-        viewModel.QueryAllPackages();
+        if (viewModel.Packages.value == null) {
+            //Query all installed packages
+            viewModel.QueryAllPackages();
+        }
 
         listAdapter = AppListAdapter(viewModel.Packages.value!!, requireContext())
 
@@ -68,24 +70,14 @@ class RulesFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.toolbarmenu, menu)
         changeIcon(menu.getItem(0).subMenu.getItem(0))
-        changeIcon(menu.getItem(0).subMenu.getItem(1))
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.toggle_mode -> toggleMode(item)
             R.id.toggle_enabled -> toggleEnabled(item)
         }
         return true
-    }
-
-    private fun toggleMode(item: MenuItem) {
-        viewModel.toggleMode()
-        listAdapter.ruleSets = viewModel.Packages.value!!
-        listAdapter.notifyDataSetChanged()
-
-        changeIcon(item)
     }
 
     private fun toggleEnabled(item: MenuItem) {
@@ -97,25 +89,14 @@ class RulesFragment : Fragment() {
     }
 
     private fun changeIcon(item: MenuItem) {
-        if(item.itemId == R.id.toggle_mode){
-            when (viewModel.Packages.value!!.mode) {
-                FirewallMode.WHITELIST -> {
-                    item.title = getString(R.string.Whitelist)
-                }
-                FirewallMode.BLACKLIST -> {
-                    item.title = getString(R.string.Blacklist)
-                }
+        when (viewModel.Packages.value!!.enabled) {
+            true -> {
+                item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_enabled)
+                item.title = getString(R.string.Enabled)
             }
-        }else{
-            when (viewModel.Packages.value!!.enabled) {
-                true -> {
-                    item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_enabled)
-                    item.title = getString(R.string.Enabled)
-                }
-                false -> {
-                    item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_disabled)
-                    item.title = getString(R.string.Disabled)
-                }
+            false -> {
+                item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_disabled)
+                item.title = getString(R.string.Disabled)
             }
         }
     }

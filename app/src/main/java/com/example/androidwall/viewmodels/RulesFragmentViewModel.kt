@@ -87,6 +87,12 @@ class RulesFragmentViewModel : ViewModel(){
     }
 
     fun saveSettings(ruleSet : RuleSet) {
+        writeToFile(ruleSet)
+
+        IPTablesHelper.applyRuleset(Packages.value!!)
+    }
+
+    private fun writeToFile(ruleSet: RuleSet){
         val gson = Gson()
 
         _Packages.value = ruleSet
@@ -96,8 +102,6 @@ class RulesFragmentViewModel : ViewModel(){
 
         //Write to rules.json
         ruleFile.writeText(json)
-
-        IPTablesHelper.applyRuleset(Packages.value!!)
     }
 
     fun toggleMode(){
@@ -115,7 +119,7 @@ class RulesFragmentViewModel : ViewModel(){
             rule.vpnEnabled = !rule.vpnEnabled
         }
 
-        _Packages.value = rules
+        writeToFile(rules)
     }
 
     fun toggleEnabled(){

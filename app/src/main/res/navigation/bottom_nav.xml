@@ -15,4 +15,9 @@
         android:name="com.example.androidwall.fragments.LogsFragment"
         android:label="@string/Logs"
         tools:layout="@layout/logs_fragment" />
+    <fragment
+        android:id="@+id/fragment_options"
+        android:name="com.example.androidwall.fragments.OptionsFragment"
+        android:label="@string/Options"
+        tools:layout="@layout/options_fragment" />
 </navigation>
