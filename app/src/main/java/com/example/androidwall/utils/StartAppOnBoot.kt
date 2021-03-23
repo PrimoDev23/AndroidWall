@@ -24,7 +24,7 @@ class StartAppOnBoot : BroadcastReceiver() {
 
     fun applyRules(context: Context) {
         val list: List<Rule>
-        var mode = FirewallMode.WHITELIST
+        var mode : FirewallMode
 
         val ruleFile = File(context.filesDir, "rules.json")
 

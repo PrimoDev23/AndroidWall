@@ -28,8 +28,6 @@ class LogsAdapter(var logs : List<Log>) : RecyclerView.Adapter<LogsAdapter.LogVi
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         val item = logs[position]
 
-        val split = item.time.split('T')
-
         holder.txt_date.text = item.date
         holder.txt_time.text = item.time
         holder.txt_message.text = item.message

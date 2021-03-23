@@ -16,8 +16,17 @@ object IPTablesHelper {
         //Flush the current iptables
         runCommand(shell.outputStream, "iptables -F OUTPUT")
 
-        //Default to drop
-        runCommand(shell.outputStream, "iptables -P OUTPUT DROP")
+        if(ruleset.mode == FirewallMode.WHITELIST) {
+            //Default to drop for whitelist
+            runCommand(
+                shell.outputStream,
+                "iptables -P OUTPUT DROP")
+        } else {
+            //Default to accept on blacklist
+            runCommand(
+                shell.outputStream,
+                "iptables -P OUTPUT ACCEPT")
+        }
 
         //Accept all outgoing connections to loopback
         runCommand(shell.outputStream, "iptables -A OUTPUT -o lo -j ACCEPT")
