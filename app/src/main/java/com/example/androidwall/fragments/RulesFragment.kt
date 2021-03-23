@@ -2,6 +2,7 @@ package com.example.androidwall.fragments
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -81,8 +82,8 @@ class RulesFragment : Fragment() {
         listAdapter.notifyDataSetChanged()
 
         when(viewModel.Packages.value!!.mode){
-            FirewallMode.WHITELIST -> item.title = getString(R.string.Whitelist)
-            FirewallMode.BLACKLIST -> item.title = getString(R.string.Blacklist)
+            FirewallMode.WHITELIST -> item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_whitelist)
+            FirewallMode.BLACKLIST -> item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_blacklist)
         }
     }
 }

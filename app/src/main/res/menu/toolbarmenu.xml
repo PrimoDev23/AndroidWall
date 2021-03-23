@@ -2,5 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/toggle_mode"
-        android:title="@string/Whitelist" />
+        android:icon="@drawable/ic_whitelist"
+        android:title="@string/Whitelist"
+        app:showAsAction="always" />
 </menu>
