@@ -36,11 +36,14 @@ class RulesFragmentViewModel : ViewModel(){
             PackageManager.GET_META_DATA
         )
 
+        //Use a default variable since we are going to add blacklist mode soon
+        val default : Boolean = true
+
         //Get all packages with corresponding uids
         for (pack in packages) {
             val info = pack.applicationInfo
             if (info.name != null && info.enabled) {
-                list.add(RuleSet(info.packageName, info.uid, true, true))
+                list.add(RuleSet(info.packageName, info.uid, default, default, default))
             }
         }
 

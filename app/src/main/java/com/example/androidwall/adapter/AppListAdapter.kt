@@ -43,6 +43,7 @@ class AppListAdapter(var ruleSets : List<RuleSet>, val context : Context) : Recy
         holder.chk_cellular.isChecked = pack.cellularEnabled
         holder.chk_vpn.isChecked = pack.vpnEnabled
 
+        //Update ruleset according to user actions
         holder.chk_wifi.setOnClickListener {
             ruleSets[position].wifiEnabled = holder.chk_wifi.isChecked
         }

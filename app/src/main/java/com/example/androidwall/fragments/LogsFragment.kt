@@ -29,10 +29,12 @@ class LogsFragment : Fragment() {
     ): View? {
         binding = LogsFragmentBinding.inflate(inflater, container, false)
 
+        //Create the viewmodel
         viewModel = ViewModelProvider(this).get(LogsFragmentViewModel::class.java)
 
         viewModel.readLogs()
 
+        //Init recyclerview
         logsAdapter = LogsAdapter(viewModel.Logs.value!!)
 
         binding.logList.apply {

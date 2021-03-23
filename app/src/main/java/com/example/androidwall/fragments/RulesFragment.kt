@@ -27,17 +27,17 @@ class RulesFragment : Fragment() {
         binding = FragmentRulesBinding.inflate(inflater, container, false)
 
         viewModel = ViewModelProvider(this).get(RulesFragmentViewModel::class.java)
-        viewModel.context = context!!
+        viewModel.context = requireContext()
 
         //Query all installed packages
         viewModel.QueryAllPackages();
 
-        listAdapter = AppListAdapter(viewModel.Packages.value!!, context!!)
+        listAdapter = AppListAdapter(viewModel.Packages.value!!, requireContext())
 
         binding.appList.apply {
             //Set adapter and layout manager
             adapter = listAdapter
-            layoutManager = LinearLayoutManager(context!!)
+            layoutManager = LinearLayoutManager(requireContext())
 
             //Add divider
             addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
@@ -55,7 +55,7 @@ class RulesFragment : Fragment() {
     }
 
     private fun initObservers(){
-        viewModel.Packages.observe(this, Observer {
+        viewModel.Packages.observe(viewLifecycleOwner, Observer {
             listAdapter.ruleSets = it
             listAdapter.notifyDataSetChanged()
         })
