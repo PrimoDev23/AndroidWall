@@ -15,11 +15,10 @@ object IPTablesHelper {
 
         //Flush the current iptables
         runCommand(shell.outputStream, "iptables -F OUTPUT")
-        runCommand(shell.outputStream, "iptables -F INPUT")
 
         //Default to drop
-        runCommand(shell.outputStream, "iptables -P OUTPUT DROP")
-        runCommand(shell.outputStream, "iptables -P INPUT DROP")
+        runCommand(shell.outputStream, "iptables -P OUTPUT REJECT")
+        runCommand(shell.outputStream, "iptables -A OUTPUT -o lo -j ACCEPT")
 
         for (rule in ruleset.rules) {
             var command : String
@@ -30,10 +29,6 @@ object IPTablesHelper {
                     shell.outputStream,
                     "iptables -A OUTPUT -o wlan+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
                 )
-                runCommand(
-                    shell.outputStream,
-                    "iptables -A INPUT -i wlan+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
-                )
             }
 
             //Block all cellular connections
@@ -42,10 +37,6 @@ object IPTablesHelper {
                     shell.outputStream,
                     "iptables -A OUTPUT -o rmnet+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
                 )
-                runCommand(
-                    shell.outputStream,
-                    "iptables -A INPUT -i rmnet+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
-                )
             }
 
             //Block all vpn connections
@@ -53,10 +44,6 @@ object IPTablesHelper {
                 runCommand(
                     shell.outputStream,
                     "iptables -A OUTPUT -o tun+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
-                )
-                runCommand(
-                    shell.outputStream,
-                    "iptables -A INPUT -i tun+ -m owner --uid-owner ${rule.uid} -j ACCEPT"
                 )
             }
         }
