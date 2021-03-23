@@ -17,14 +17,12 @@ object IPTablesHelper {
         runCommand(shell.outputStream, "iptables -F OUTPUT")
 
         //Default to drop
-        runCommand(shell.outputStream, "iptables -P OUTPUT REJECT")
+        runCommand(shell.outputStream, "iptables -P OUTPUT DROP")
 
         //Accept all outgoing connections to loopback
         runCommand(shell.outputStream, "iptables -A OUTPUT -o lo -j ACCEPT")
 
         for (rule in ruleset.rules) {
-            var command : String
-
             //Block all wifi connections
             if ((ruleset.mode == FirewallMode.WHITELIST && rule.wifiEnabled) || (ruleset.mode == FirewallMode.BLACKLIST && !rule.wifiEnabled)) {
                 runCommand(

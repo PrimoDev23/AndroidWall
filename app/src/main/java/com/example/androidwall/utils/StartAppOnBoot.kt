@@ -16,13 +16,14 @@ import java.io.File
 
 class StartAppOnBoot : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
+        Logger.context = p0!!
         if (p1?.action == Intent.ACTION_BOOT_COMPLETED) {
-            applyRules(p0!!);
+            applyRules(p0)
         }
     }
 
-    fun applyRules(context : Context) {
-        val list : List<Rule>
+    fun applyRules(context: Context) {
+        val list: List<Rule>
         var mode = FirewallMode.WHITELIST
 
         val ruleFile = File(context.filesDir, "rules.json")
@@ -36,7 +37,7 @@ class StartAppOnBoot : BroadcastReceiver() {
             val type = object : TypeToken<RuleSet>() {}.type
 
             //Get rules from JSON
-            val ruleSet : RuleSet = gson.fromJson(json, type)
+            val ruleSet: RuleSet = gson.fromJson(json, type)
 
             //Set the current mode
             mode = ruleSet.mode
@@ -60,13 +61,13 @@ class StartAppOnBoot : BroadcastReceiver() {
         }
     }
 
-    private fun getPackages(mode : FirewallMode, context : Context) : List<Rule>{
+    private fun getPackages(mode: FirewallMode, context: Context): List<Rule> {
         //Retrieve all installed packages
         val packages: List<PackageInfo> = context.packageManager.getInstalledPackages(
             PackageManager.GET_META_DATA
         )
 
-        val list : MutableList<Rule> = mutableListOf()
+        val list: MutableList<Rule> = mutableListOf()
 
         val default = mode == FirewallMode.WHITELIST;
 
