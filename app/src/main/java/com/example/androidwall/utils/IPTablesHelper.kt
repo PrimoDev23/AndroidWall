@@ -18,6 +18,8 @@ object IPTablesHelper {
 
         //Default to drop
         runCommand(shell.outputStream, "iptables -P OUTPUT REJECT")
+
+        //Accept all outgoing connections to loopback
         runCommand(shell.outputStream, "iptables -A OUTPUT -o lo -j ACCEPT")
 
         for (rule in ruleset.rules) {
