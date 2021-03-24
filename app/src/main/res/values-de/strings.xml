@@ -9,4 +9,9 @@
     <string name="FirewallMode">Firewall-Modus</string>
     <string name="Enabled">Aktiviert</string>
     <string name="Disabled">Deaktiviert</string>
+    <string name="Status">Status</string>
+    <string name="WiFi">WLAN</string>
+    <string name="VPN">VPN</string>
+    <string name="Blacklist">Blacklist</string>
+    <string name="Whitelist">Whitelist</string>
 </resources>

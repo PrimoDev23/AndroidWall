@@ -75,8 +75,6 @@ class RulesFragment : Fragment() {
 
         initObservers()
 
-        setHasOptionsMenu(true)
-
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -86,39 +84,5 @@ class RulesFragment : Fragment() {
             listAdapter.ruleSets = it
             listAdapter.notifyDataSetChanged()
         })
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.toolbarmenu, menu)
-        changeIcon(menu.getItem(0).subMenu.getItem(0))
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.toggle_enabled -> toggleEnabled(item)
-        }
-        return true
-    }
-
-    private fun toggleEnabled(item: MenuItem) {
-        viewModel.toggleEnabled()
-        listAdapter.ruleSets = viewModel.Packages.value!!
-        listAdapter.notifyDataSetChanged()
-
-        changeIcon(item)
-    }
-
-    private fun changeIcon(item: MenuItem) {
-        when (viewModel.Packages.value!!.enabled) {
-            true -> {
-                item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_enabled)
-                item.title = getString(R.string.Enabled)
-            }
-            false -> {
-                item.icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_disabled)
-                item.title = getString(R.string.Disabled)
-            }
-        }
     }
 }

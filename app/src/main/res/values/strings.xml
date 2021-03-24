@@ -1,18 +1,19 @@
 <resources>
     <string name="app_name">AndroidWall</string>
-    <string name="WiFi" translatable="false">WiFi</string>
+    <string name="WiFi">WiFi</string>
     <string name="Cellular">Cellular</string>
     <string name="Applying">Applying Rules</string>
 
-    <string name="VPN" translatable="false">VPN</string>
+    <string name="VPN">VPN</string>
     <string name="Home">Home</string>
     <string name="Logs">Logs</string>
 
     <string name="Options">Options</string>
     <string name="FirewallMode">Firewall Mode</string>
 
-    <string name="Blacklist" translatable="false">Blacklist</string>
-    <string name="Whitelist" translatable="false">Whitelist</string>
+    <string name="Blacklist">Blacklist</string>
+    <string name="Whitelist">Whitelist</string>
     <string name="Enabled">Enabled</string>
     <string name="Disabled">Disabled</string>
+    <string name="Status">Status</string>
 </resources>
