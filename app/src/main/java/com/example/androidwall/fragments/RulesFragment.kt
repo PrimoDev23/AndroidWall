@@ -1,25 +1,32 @@
 package com.example.androidwall.fragments
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidwall.R
 import com.example.androidwall.adapter.AppListAdapter
 import com.example.androidwall.databinding.FragmentRulesBinding
-import com.example.androidwall.models.FirewallMode
 import com.example.androidwall.viewmodels.RulesFragmentViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 
 class RulesFragment : Fragment() {
 
     private lateinit var binding: FragmentRulesBinding
     private lateinit var viewModel: RulesFragmentViewModel
     private lateinit var listAdapter: AppListAdapter
+
+    private lateinit var progressDialog : Dialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,6 +43,11 @@ class RulesFragment : Fragment() {
             viewModel.QueryAllPackages();
         }
 
+        progressDialog = Dialog(requireContext())
+
+        progressDialog.setContentView(LayoutInflater.from(requireContext()).inflate(R.layout.progress_layout, null))
+        progressDialog.setCancelable(false)
+
         listAdapter = AppListAdapter(viewModel.Packages.value!!, requireContext())
 
         binding.appList.apply {
@@ -48,8 +60,17 @@ class RulesFragment : Fragment() {
         }
 
         binding.fabTest.setOnClickListener {
-            //Reload all packages
-            viewModel.saveSettings(listAdapter.ruleSets)
+            lifecycleScope.launchWhenStarted {
+                progressDialog.show()
+
+                //Launch this asynchronously
+                withContext(Dispatchers.IO) {
+                    //Reload all packages
+                    viewModel.saveSettings(listAdapter.ruleSets)
+                }
+
+                progressDialog.dismiss()
+            }
         }
 
         initObservers()

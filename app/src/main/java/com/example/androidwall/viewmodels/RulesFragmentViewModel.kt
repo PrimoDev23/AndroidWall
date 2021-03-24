@@ -95,7 +95,7 @@ class RulesFragmentViewModel : ViewModel(){
     private fun writeToFile(ruleSet: RuleSet){
         val gson = Gson()
 
-        _Packages.value = ruleSet
+        _Packages.postValue(ruleSet)
 
         //Generate JSON from rules
         val json = gson.toJson(ruleSet)
