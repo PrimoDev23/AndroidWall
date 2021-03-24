@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AndroidWall</string>
+    <string name="Cellular">Mobil</string>
+    <string name="Applying">Regeln anwenden</string>
+    <string name="Home">Startseite</string>
+    <string name="Logs">Logs</string>
+    <string name="Options">Einstellungen</string>
+    <string name="FirewallMode">Firewall-Modus</string>
+    <string name="Enabled">Aktiviert</string>
+    <string name="Disabled">Deaktiviert</string>
+</resources>
