@@ -10,9 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidwall.R
 import com.example.androidwall.models.Rule
-import com.example.androidwall.models.RuleSet
 
-class AppListAdapter(var ruleSets : RuleSet, val context : Context) : RecyclerView.Adapter<AppListAdapter.AppListViewHolder>() {
+class AppListAdapter(var rules : List<Rule>, val context : Context) : RecyclerView.Adapter<AppListAdapter.AppListViewHolder>() {
 
     inner class AppListViewHolder(view : View) : RecyclerView.ViewHolder(view) {
         val txt_name : TextView = view.findViewById(R.id.txt_name)
@@ -30,11 +29,11 @@ class AppListAdapter(var ruleSets : RuleSet, val context : Context) : RecyclerVi
     }
 
     override fun getItemCount(): Int {
-        return ruleSets.rules.size
+        return rules.size
     }
 
     override fun onBindViewHolder(holder: AppListViewHolder, position: Int) {
-        val pack : Rule = ruleSets.rules[position]
+        val pack : Rule = rules[position]
 
         //Init the views
         holder.txt_name.text = pack.name

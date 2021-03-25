@@ -5,13 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import com.example.androidwall.MainActivity
 import com.example.androidwall.models.FirewallMode
 import com.example.androidwall.models.Rule
-import com.example.androidwall.models.RuleSet
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import java.io.File
+import com.example.androidwall.models.Setting
 
 
 class StartAppOnBoot : BroadcastReceiver() {
@@ -22,38 +18,37 @@ class StartAppOnBoot : BroadcastReceiver() {
         }
     }
 
-    fun applyRules(context: Context) {
-        val list: List<Rule>
+    fun applyRules(context : Context){
+        val setting : Setting
 
-        val ruleFile = File(context.filesDir, "rules.json")
+        val settingDao = AppDatabase.getInstance(context).settingDao()
+        val rulesDao = AppDatabase.getInstance(context).rulesDao()
 
-        if (ruleFile.exists()) {
-            //Read JSON
-            val json = ruleFile.readText()
+        val dbSettings = settingDao.getSetting()
 
-            val gson = Gson()
+        //If settings are not created yet we need to create a new one, else load old ones
+        if(dbSettings.isNotEmpty()) {
+            setting = dbSettings[0]
 
-            val type = object : TypeToken<RuleSet>() {}.type
+            val loadedRules = rulesDao.getRules()
 
-            //Get rules from JSON
-            val ruleSet: RuleSet = gson.fromJson(json, type)
+            val defaultRules = getPackages(setting.mode, context)
 
-            //Get all packages with default rules based on mode
-            list = getPackages(ruleSet.mode, context)
+            //If rules are empty we are creating default rules for every package
+            //If rules exist just load them
+            if (loadedRules.isNotEmpty()) {
+                for (rule in defaultRules) {
+                    val match = loadedRules.firstOrNull { it.name == rule.name }
 
-            //Iterate through apps and adjust rules
-            //This way we using the current package list as base
-            //So there won't be issues when installing/uninstalling apps
-            for (r in ruleSet.rules) {
-                val pack = list.firstOrNull { it.name == r.name }
-                pack?.let {
-                    pack.cellularEnabled = r.cellularEnabled
-                    pack.wifiEnabled = r.wifiEnabled
-                    pack.vpnEnabled = r.vpnEnabled
+                    //If we found a match update the default rules
+                    //Else use the default rule
+                    if (match != null) {
+                        rule.cellularEnabled = match.cellularEnabled
+                        rule.wifiEnabled = match.wifiEnabled
+                        rule.vpnEnabled = match.vpnEnabled
+                    }
                 }
             }
-
-            IPTablesHelper.applyRuleset(RuleSet(ruleSet.enabled, ruleSet.mode, list))
         }
     }
 

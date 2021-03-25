@@ -6,72 +6,80 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.androidwall.models.FirewallMode
 import com.example.androidwall.models.Rule
-import com.example.androidwall.models.RuleSet
+import com.example.androidwall.models.Setting
+import com.example.androidwall.utils.AppDatabase
 import com.example.androidwall.utils.IPTablesHelper
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
-class RulesFragmentViewModel : ViewModel(){
-    private val _Packages: MutableLiveData<RuleSet> = MutableLiveData()
-    val Packages: LiveData<RuleSet>
-        get() = _Packages
+class RulesFragmentViewModel : ViewModel() {
+    private val _Rules: MutableLiveData<List<Rule>> = MutableLiveData(listOf())
+    val Rules: LiveData<List<Rule>>
+        get() = _Rules
+
+    private val _Settings: MutableLiveData<Setting> = MutableLiveData()
+    val Settings: LiveData<Setting>
+        get() = _Settings
 
     lateinit var context: Context
 
-    private val ruleFile by lazy{
+    private val ruleFile by lazy {
         File(context.filesDir, "rules.json")
     }
 
-    fun QueryAllPackages() {
-        val list : List<Rule>
+    fun initValues() {
+        val setting: Setting
 
-        if (ruleFile.exists()) {
-            //Read JSON
-            val json = ruleFile.readText()
+        val settingDao = AppDatabase.getInstance(context).settingDao()
+        val rulesDao = AppDatabase.getInstance(context).rulesDao()
 
-            val gson = Gson()
+        val dbSettings = settingDao.getSetting()
 
-            val type = object : TypeToken<RuleSet>() {}.type
+        //If settings are not created yet we need to create a new one, else load old ones
+        if (dbSettings.isNotEmpty()) {
+            setting = dbSettings[0]
+        } else {
+            setting = Setting(0, false, FirewallMode.WHITELIST)
+            settingDao.insertSetting(setting)
+        }
+        _Settings.postValue(setting)
 
-            //Get rules from JSON
-            val ruleSet : RuleSet = gson.fromJson(json, type)
+        val loadedRules = rulesDao.getRules()
 
-            //Get all packages with default rules based on mode
-            list = getPackages(ruleSet.mode)
+        val defaultRules = getPackages(setting.mode)
 
-            //Iterate through apps and adjust rules
-            //This way we using the current package list as base
-            //So there won't be issues when installing/uninstalling apps
-            for (r in ruleSet.rules) {
-                val pack = list.firstOrNull { it.name == r.name }
-                pack?.let {
-                    pack.cellularEnabled = r.cellularEnabled
-                    pack.wifiEnabled = r.wifiEnabled
-                    pack.vpnEnabled = r.vpnEnabled
+        //If rules are empty we are creating default rules for every package
+        //If rules exist just load them
+        if (loadedRules.isNotEmpty()) {
+            for (rule in defaultRules) {
+                val match = loadedRules.firstOrNull { it.name == rule.name }
+
+                //If we found a match update the default rules
+                //Else use the default rule
+                if (match != null) {
+                    rule.cellularEnabled = match.cellularEnabled
+                    rule.wifiEnabled = match.wifiEnabled
+                    rule.vpnEnabled = match.vpnEnabled
                 }
             }
-
-            //Set the packages
-            _Packages.value = RuleSet(ruleSet.enabled, ruleSet.mode, list)
-        } else {
-            //Get all packages with default rules based on mode
-            list = getPackages(FirewallMode.WHITELIST)
-
-            //If it's the first run just use a clean ruleset
-            saveSettings(RuleSet(false, FirewallMode.WHITELIST, list))
         }
+
+        //Set the current rules to default rules
+        _Rules.postValue(defaultRules)
     }
 
-    private fun getPackages(mode : FirewallMode) : List<Rule>{
+    private fun getPackages(mode: FirewallMode): List<Rule> {
         //Retrieve all installed packages
         val packages: List<PackageInfo> = context.packageManager.getInstalledPackages(
             PackageManager.GET_META_DATA
         )
 
-        val list : MutableList<Rule> = mutableListOf()
+        val list: MutableList<Rule> = mutableListOf()
 
         val default = mode == FirewallMode.WHITELIST;
 
@@ -86,47 +94,52 @@ class RulesFragmentViewModel : ViewModel(){
         return list
     }
 
-    fun saveSettings(ruleSet : RuleSet) {
-        writeToFile(ruleSet)
-
-        IPTablesHelper.applyRuleset(Packages.value!!)
-    }
-
-    private fun writeToFile(ruleSet: RuleSet){
-        val gson = Gson()
-
-        _Packages.postValue(ruleSet)
-
-        //Generate JSON from rules
-        val json = gson.toJson(ruleSet)
-
-        //Write to rules.json
-        ruleFile.writeText(json)
-    }
-
-    fun toggleMode(){
-        val rules : RuleSet = _Packages.value!!
-
-        when(rules.mode){
-            FirewallMode.WHITELIST -> rules.mode = FirewallMode.BLACKLIST
-            FirewallMode.BLACKLIST -> rules.mode = FirewallMode.WHITELIST
+    fun updateRules(rules: List<Rule>) {
+        for (rule in rules) {
+            AppDatabase.getInstance(context).rulesDao().updateRule(rule)
         }
 
-        //Invert all values so the user can just continue his setup
-        for (rule in rules.rules){
+        _Rules.postValue(rules)
+
+        IPTablesHelper.applyRuleset(rules, _Settings.value!!)
+    }
+
+    fun toggleMode() {
+        val setting = _Settings.value!!
+
+        val rules = _Rules.value!!
+
+        setting.mode =
+            if (setting.mode == FirewallMode.WHITELIST) FirewallMode.BLACKLIST else FirewallMode.WHITELIST
+
+        //Invert all settings to keep the users setup
+        for (rule in rules){
             rule.wifiEnabled = !rule.wifiEnabled
             rule.cellularEnabled = !rule.cellularEnabled
             rule.vpnEnabled = !rule.vpnEnabled
         }
 
-        writeToFile(rules)
+        //Update the rules in DB
+        for (rule in rules) {
+            AppDatabase.getInstance(context).rulesDao().updateRule(rule)
+        }
+
+        _Rules.postValue(rules)
+
+        updateSetting(setting)
     }
 
-    fun toggleEnabled(){
-        val ruleSet = _Packages.value!!
+    fun toggleEnabled() {
+        val setting = _Settings.value!!
 
-        ruleSet.enabled = !ruleSet.enabled
+        setting.enabled = !setting.enabled
 
-        _Packages.value = ruleSet
+        updateSetting(setting)
+    }
+
+    private fun updateSetting(setting: Setting) {
+        AppDatabase.getInstance(context).settingDao().updateSetting(setting)
+
+        _Settings.postValue(setting)
     }
 }

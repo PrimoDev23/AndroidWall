@@ -6,15 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.example.androidwall.R
 import com.example.androidwall.databinding.OptionsFragmentBinding
 import com.example.androidwall.models.FirewallMode
 import com.example.androidwall.viewmodels.RulesFragmentViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class OptionsFragment : Fragment() {
 
-    private lateinit var binding : OptionsFragmentBinding
-    private lateinit var rulesViewModel : RulesFragmentViewModel
+    private lateinit var binding: OptionsFragmentBinding
+    private lateinit var rulesViewModel: RulesFragmentViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,22 +28,30 @@ class OptionsFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = OptionsFragmentBinding.inflate(inflater, container, false)
 
-        rulesViewModel = ViewModelProvider(requireActivity()).get(RulesFragmentViewModel::class.java)
+        rulesViewModel =
+            ViewModelProvider(requireActivity()).get(RulesFragmentViewModel::class.java)
 
         binding.layoutMode.setOnClickListener {
-            //Toggle mode on click
-            rulesViewModel.toggleMode()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    //Toggle mode on click
+                    rulesViewModel.toggleMode()
+                }
 
-            //Set the text
-            setModeText()
+                //Set the text
+                setModeText()
+            }
         }
 
         binding.layoutEnabled.setOnClickListener {
-            //Toggle enabled status
-            rulesViewModel.toggleEnabled()
-
-            //Set the new text according to new status
-            setStatusText()
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) {
+                    //Toggle enabled status
+                    rulesViewModel.toggleEnabled()
+                }
+                //Set the new text according to new status
+                setStatusText()
+            }
         }
 
         setModeText()
@@ -47,11 +60,17 @@ class OptionsFragment : Fragment() {
         return binding.root
     }
 
-    private fun setModeText(){
-        binding.txtFirewallmode.text = if (rulesViewModel.Packages.value!!.mode == FirewallMode.WHITELIST) getString(R.string.Whitelist) else getString(R.string.Blacklist)
+    private fun setModeText() {
+        binding.txtFirewallmode.text =
+            if (rulesViewModel.Settings.value!!.mode == FirewallMode.WHITELIST) getString(R.string.Whitelist) else getString(
+                R.string.Blacklist
+            )
     }
 
-    private fun setStatusText(){
-        binding.txtStatus.text = if (rulesViewModel.Packages.value!!.enabled) getString(R.string.Enabled) else getString(R.string.Disabled)
+    private fun setStatusText() {
+        binding.txtStatus.text =
+            if (rulesViewModel.Settings.value!!.enabled) getString(R.string.Enabled) else getString(
+                R.string.Disabled
+            )
     }
 }

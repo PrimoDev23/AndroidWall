@@ -1,12 +1,8 @@
 package com.example.androidwall.utils
 
 import com.example.androidwall.models.FirewallMode
-import com.example.androidwall.models.RuleSet
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.OutputStream
-import java.lang.Exception
-import java.util.concurrent.TimeUnit
+import com.example.androidwall.models.Rule
+import com.example.androidwall.models.Setting
 
 object IPTablesHelper {
 
@@ -14,17 +10,17 @@ object IPTablesHelper {
 
     //Currently we only have whitelist mode and selected all by default
     //This is for testing purposes but will change later
-    fun applyRuleset(ruleset: RuleSet) {
+    fun applyRuleset(rules : List<Rule>, setting : Setting) {
         //Get a root shell
         val shell = Runtime.getRuntime().exec("su")
 
         //Only apply rules if firewall is not disabled
-        if (ruleset.enabled) {
+        if (setting.enabled) {
             //We are always setting up the chain again since we can't really check for errors
             //If operation succeed error stream can't be read
             setupChain(shell)
 
-            if (ruleset.mode == FirewallMode.WHITELIST) {
+            if (setting.mode == FirewallMode.WHITELIST) {
                 //Default to drop for whitelist
                 runCommand(shell, "iptables -P OUTPUT DROP")
 
@@ -40,9 +36,9 @@ object IPTablesHelper {
                 runCommand(shell, "iptables -P OUTPUT ACCEPT")
             }
 
-            val policy = if (ruleset.mode == FirewallMode.WHITELIST) "ACCEPT" else "DROP"
+            val policy = if (setting.mode == FirewallMode.WHITELIST) "ACCEPT" else "DROP"
 
-            for (rule in ruleset.rules) {
+            for (rule in rules) {
                 //Block all wifi connections
                 if (rule.wifiEnabled) {
                     runCommand(
